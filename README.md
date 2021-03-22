@@ -22,7 +22,10 @@ Note :- Before pushing image into ECR you have to setup registry into ECR. 
 Explanation:
 
 Created namespace 
+Converted private ket into secret and create secret from this
 
+    $kubectl create secret generic --from-file=private_key_file -o yaml --dry-run=client > private-key-secret.yaml
+    
     $ kubectl apply -f ns.yaml
   
 Edit below files and change values as per environment 
