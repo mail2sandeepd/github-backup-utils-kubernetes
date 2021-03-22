@@ -1,4 +1,4 @@
-# iac-github-backup-kubernetes
+# github-backup-utils-kubernetes
 GitHub Backup utils can be downloaded from https://github.com/github/backup-utils and the requirement was to keep the app inside a container. There is a no container image build by GitHub but it have Docker https://github.com/github/backup-utils/blob/master/Dockerfile file to create image we have include aws cli utility as per our requirement to push backup to S3 using aws cli. sample Docker file is Docker-AWS.
 
 Build container images
