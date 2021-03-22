@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: known-hosts-configmap
+  namespace: github-backup
+data:
+  known_hosts: |
+          
+          #xx.xx.xx..xx ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPYt/R+OQKhysxmKH7wjMjkbcjbclskdncbvk.dbwubdsb.ihwelvnDOPJwldsbjknvbsDb,svksdnkjvn,mxnlkndsal==

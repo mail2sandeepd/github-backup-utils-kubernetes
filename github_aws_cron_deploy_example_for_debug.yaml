@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-backup
+  namespace: github-backup
+  labels:
+    k8s-app: github-backup
+spec:
+  selector:
+    matchLabels:
+      k8s-app: github-backup
+  template:
+    metadata:
+      labels:
+        k8s-app: github-backup
+    spec:
+      containers:
+      - name: github-backup-utils
+        image: ECR_IMAGE_ID ### 
+        imagePullPolicy: IfNotPresent
+        args:
+        - sleep
+        - "3600"
+        volumeMounts:
+        - name: github-data
+          mountPath: /data
+        - name: known-hosts-volume
+          mountPath: /ghe-ssh/known_hosts
+          subPath: known_hosts
+          readOnly: true
+        - name: backup-compress-s3-upload-volume 
+          mountPath: /backup-utils/S3_upload
+          subPath: S3_upload
+          readOnly: true
+        - name: backup-config-volume
+          mountPath: /backup-utils/backup.config
+          subPath: backup.config
+          readOnly: true
+        - name: github-private-key-volume
+          mountPath: /ghe-ssh/id_ed25519
+          subPath: id_ed25519
+          readOnly: true
+      volumes:
+        - name: github-data
+          persistentVolumeClaim:
+            claimName: github-backup-pv-claim
+        - name: known-hosts-volume
+          configMap:
+            name: known-hosts-configmap
+            items:
+            - key: known_hosts
+              path: known_hosts
+        - name: backup-compress-s3-upload-volume
+          configMap:
+            name: backup-compress-s3-upload
+            items:
+            - key: S3_upload
+              path: S3_upload
+            defaultMode: 0755
+        - name: backup-config-volume
+          configMap:
+            name: backup-config-configmap
+            items:
+            - key: backup.config
+              path: backup.config
+        - name: github-private-key-volume
+          secret:
+            secretName: github-private-key-secret
+            defaultMode: 0400

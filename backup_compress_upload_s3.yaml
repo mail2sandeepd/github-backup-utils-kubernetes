@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: backup-compress-s3-upload
+  namespace: github-backup
+data:
+  S3_upload: |
+    #/bin/bash
+    echo Starting Backup at $(date +'%Y/%m/%d %H:%M:%S')
+    /backup-utils/bin/ghe-backup
+    RESULT1=$?
+    echo Backup Completed at $(date +'%Y/%m/%d %H:%M:%S')
+
+    DATA_FILE_PATH='/data/current'
+    FILE_NAME=`basename $( realpath $DATA_FILE_PATH )`
+    DATA_FOLDER='/data/'
+    ####
+    S3_BUCKET='YOUR_AWS_S3_BUCKET_NAME'  #i.e s3://BUCKET_NAME/'
+
+    echo Latest backup folder is $FILE_NAME
+
+    stat $DATA_FOLDER$FILE_NAME.tar > /dev/null 2>&1
+    RESULT2=$?
+    if [ $RESULT1 == 0 ]; [ $RESULT2 == 1 ]; then
+        echo Starting compression at $(date +'%Y/%m/%d %H:%M:%S'), please wait... && cd $DATA_FOLDER && tar -czf $FILE_NAME.tar $FILE_NAME && echo Compression Done at $(date +'%Y/%m/%d %H:%M:%S'), $FILE_NAME.tar ready to move to AWS S3.
+    else
+        echo compressed $FILE_NAME.tar already present, ready to move to AWS S3.
+    fi
+    echo Started copy $FILE_NAME.tar to $S3_BUCKET at $(date +'%Y/%m/%d %H:%M:%S')
+    /usr/local/bin/aws s3 cp $DATA_FOLDER$FILE_NAME.tar $S3_BUCKET
+    echo Copy completed $FILE_NAME.tar to S3 at $(date +'%Y/%m/%d %H:%M:%S')
+    echo Removing old compressed files. && ls -t1 $DATA_FOLDER*.tar| tail -n +1 | xargs rm -r && echo =======================================
