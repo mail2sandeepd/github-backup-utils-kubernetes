@@ -7,8 +7,8 @@ We have build container images, and uploaded to Amazon ECR.
  Clone upstream Git repository
 
 
-    $ mkdir devel
-    $ cd devel
+    $ mkdir work
+    $ cd work
     $ git clone https://github.com/github/backup-utils.git
     $ cd backup-utils
 
@@ -21,12 +21,19 @@ Note :- Before pushing image into ECR you have to setup registry into ECR. 
 
 Explanation:
 
-Created namespace 
-Converted private ket into secret and create secret from this
+Converted private key into secret and create secret from this
 
     $kubectl create secret generic --from-file=private_key_file -o yaml --dry-run=client > private-key-secret.yaml
-    
+
+Deploying kubernetes job for backup and pushing backup to AWS S3.
+
     $ kubectl apply -f ns.yaml
+    $ kubectl apply -f private-key-secret.yaml
+    $ kubectl apply -f known-hosts-configmap.yaml
+    $ kubectl apply -f backup-config-configmap.yaml
+    $ kubectl apply -f backup_compress_upload_s3.yaml
+    $ kubectl apply -f pvc.yaml
+    $ kubectl apply -f github_cron_aws.yaml
   
 Edit below files and change values as per environment 
     
